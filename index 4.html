@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="icon" type="image/png" href="favicon.jpeg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.jpeg" />
+    <link rel="apple-touch-icon" href="favicon.jpeg" />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finny's Private Site</title>
+    <meta name="title" content="Finny's private site" />
+    <meta name="description" content="Its Finnegans private site not made by me." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://gn-math.github.io/" />
+    <meta property="og:title" content="Finny's private site" />
+    <meta property="og:description" content="Play unbl*cked games like Crazy Cattle 3D and DriveMad on GN-Math. Fast, free, no downloads—perfect for school or home." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://gn-math.github.io/" />
+    <meta name="twitter:title" content="Finny's private site" />
+    <meta name="twitter:description" content="Play unbl*cked games like Crazy Cattle 3D and DriveMad on GN-Math. Fast, free, no downloads—perfect for school or home." />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#0f0f2b" />
+
+    <style>
+      /* ─────────────────────────────────────────
+         LOGIN OVERLAY  (black + light red theme)
+         inherits font-family from style.css
+      ───────────────────────────────────────── */
+      #loginOverlay {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #loginOverlay.hidden {
+        display: none;
+      }
+
+      /* soft red glow blobs */
+      #loginOverlay::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(ellipse at 25% 55%, rgba(200, 30, 30, 0.1) 0%, transparent 55%),
+          radial-gradient(ellipse at 80% 25%, rgba(180, 20, 20, 0.07) 0%, transparent 50%);
+      }
+
+      /* faint red grid */
+      #loginOverlay::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(160, 0, 0, 0.045) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(160, 0, 0, 0.045) 1px, transparent 1px);
+        background-size: 50px 50px;
+      }
+
+      .login-card {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 400px;
+        margin: 20px;
+        background: #0c0c0c;
+        border: 1px solid #1e0808;
+        border-radius: 14px;
+        padding: 38px 34px;
+        box-shadow:
+          0 0 0 1px rgba(180, 20, 20, 0.07),
+          0 28px 70px rgba(0, 0, 0, 0.75),
+          inset 0 1px 0 rgba(255, 50, 50, 0.05);
+        opacity: 0;
+        transform: translateY(22px);
+        animation: loginCardIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.05s forwards;
+      }
+
+      /* top red accent line */
+      .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 10%; right: 10%;
+        height: 1.5px;
+        border-radius: 99px;
+        background: linear-gradient(90deg, transparent, #c41e1e 40%, #e84040 60%, #c41e1e, transparent);
+      }
+
+      @keyframes loginCardIn {
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .login-site-name {
+        text-align: center;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 3.5px;
+        text-transform: uppercase;
+        color: #b01818;
+        margin-bottom: 8px;
+      }
+
+      .login-heading {
+        text-align: center;
+        font-size: 1.45rem;
+        font-weight: 900;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 3px;
+      }
+
+      .login-tagline {
+        text-align: center;
+        font-size: 0.78rem;
+        color: #444;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 30px;
+      }
+
+      /* error banner */
+      .login-error {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        background: rgba(180, 20, 20, 0.12);
+        border: 1px solid rgba(180, 20, 20, 0.35);
+        border-radius: 8px;
+        padding: 9px 13px;
+        font-size: 0.85rem;
+        color: #e05555;
+        margin-bottom: 18px;
+      }
+
+      .login-error.show {
+        display: flex;
+        animation: errShake 0.38s ease;
+      }
+
+      @keyframes errShake {
+        0%,100%{ transform: translateX(0); }
+        20%,60%{ transform: translateX(-5px); }
+        40%,80%{ transform: translateX(5px); }
+      }
+
+      /* fields */
+      .login-field { margin-bottom: 17px; }
+
+      .login-field label {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color: #4a4a4a;
+        margin-bottom: 7px;
+      }
+
+      .login-input-wrap { position: relative; }
+
+      .login-input-wrap .l-icon {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #333;
+        pointer-events: none;
+        transition: color 0.2s;
+      }
+
+      .login-input-wrap input:focus ~ .l-icon {
+        color: #cc2222;
+      }
+
+      .login-input-wrap input {
+        width: 100%;
+        background: #111;
+        border: 1px solid #1f1f1f;
+        border-radius: 8px;
+        padding: 11px 42px;
+        color: #ddd;
+        font-family: inherit;
+        font-size: 0.96rem;
+        font-weight: 600;
+        letter-spacing: 0.4px;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      }
+
+      .login-input-wrap input::placeholder { color: #2e2e2e; }
+
+      .login-input-wrap input:focus {
+        border-color: #aa1a1a;
+        background: #120808;
+        box-shadow: 0 0 0 3px rgba(180, 20, 20, 0.14);
+      }
+
+      .pass-eye {
+        position: absolute;
+        right: 11px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #333;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        transition: color 0.2s;
+      }
+
+      .pass-eye:hover { color: #cc2222; }
+
+      /* submit button */
+      .login-btn {
+        width: 100%;
+        padding: 12.5px;
+        background: #be1b1b;
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        font-family: inherit;
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
+        box-shadow: 0 4px 18px rgba(160, 20, 20, 0.45);
+      }
+
+      .login-btn::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255,255,255,0.09) 0%, transparent 100%);
+        pointer-events: none;
+      }
+
+      .login-btn:hover {
+        background: #d42020;
+        transform: translateY(-1px);
+        box-shadow: 0 7px 22px rgba(190, 27, 27, 0.55);
+      }
+
+      .login-btn:active { transform: translateY(0); }
+
+      .login-btn.loading { pointer-events: none; opacity: 0.6; }
+
+      .login-btn.success {
+        background: #166b34;
+        box-shadow: 0 4px 18px rgba(20, 140, 60, 0.4);
+        pointer-events: none;
+      }
+
+      .l-spinner {
+        display: inline-block;
+        width: 13px;
+        height: 13px;
+        border: 2px solid rgba(255,255,255,0.25);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.55s linear infinite;
+        vertical-align: middle;
+        margin-right: 7px;
+      }
+
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      .login-divider {
+        height: 1px;
+        background: #161616;
+        margin: 24px 0;
+      }
+
+      .login-hint {
+        text-align: center;
+        font-size: 0.78rem;
+        color: #3e3e3e;
+        letter-spacing: 0.3px;
+      }
+
+      .login-hint span { color: #cc2222; font-weight: 700; }
+
+      /* ─────────────────────────────────────────
+         MAIN SITE  (hidden until auth passes)
+      ───────────────────────────────────────── */
+      #mainSite { display: none; }
+      #mainSite.visible { display: block; }
+    </style>
+  </head>
+
+  <body class="dark-mode">
+
+    <!-- ══════════════════════════════════════
+         LOGIN OVERLAY
+    ══════════════════════════════════════ -->
+    <div id="loginOverlay">
+      <div class="login-card">
+
+        <div class="login-site-name">Finny's Private Site</div>
+        <div class="login-heading">Hey, are you Finn?</div>
+        <div class="login-tagline">This site is private · Finn only</div>
+
+        <div class="login-error" id="loginError">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span id="loginErrorText">This device is not recognised as Finn's.</span>
+        </div>
+
+        <button class="login-btn" id="loginSubmit" onclick="doLogin()" type="button">
+          Yes, I'm Finn — Let Me In
+        </button>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         MAIN SITE
+    ══════════════════════════════════════ -->
+    <div id="mainSite">
+      <header>
+        <div class="header-content">
+          <div class="logo">Finny's private site</div>
+          <div class="search-container">
+            <input type="text" id="searchBar" placeholder="Search zones..." oninput="filterZones()" />
+            <select id="sortOptions" onchange="sortZones()">
+              <option value="name">Name</option>
+              <option value="id">ID (Date)</option>
+              <option value="popular">Popular</option>
+              <option value="trendingDay">Trending (Day)</option>
+              <option value="trendingWeek">Trending (Week)</option>
+              <option value="trendingMonth">Trending (Month)</option>
+            </select>
+            <select id="filterOptions" onchange="filterZones2()">
+              <option value="none">(SELECT TAG)</option>
+            </select>
+          </div>
+          <div class="control-buttons">
+            <button id="refresh" class="control-button" title="Refresh all the zones" onclick="listZones()">
+              <img src="refresh-icon.png" alt="refresh" />
+            </button>
+            <button id="settings" class="control-button" title="Settings!">
+              <img src="setting.png" alt="settings" />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <details id="featuredZonesWrapper" open>
+          <summary id="allZonesSummary" style="font-size: 1.2rem; font-weight: bold; cursor: pointer">
+            Featured Games
+          </summary>
+          <div id="featuredZones" class="zone-container"></div>
+        </details>
+        <br />
+        <hr />
+        <br />
+        <details id="allZonesWrapper" open>
+          <summary id="allSummary" style="font-size: 1.2rem; font-weight: bold; cursor: pointer">All Games</summary>
+          <div id="container">Loading...</div>
+        </details>
+      </main>
+
+      <div id="zoneViewer">
+        <div class="zone-header">
+          <div class="zone-title">
+            <h2 id="zoneName">Game</h2>
+            <button class="info-button" onclick="showZoneInfo()" title="Zone Information">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+            </button>
+            <span id="zoneId" style="display: none"></span>
+            <a id="zoneAuthor" href="#" target="_blank">by Author</a>
+          </div>
+          <div class="zone-controls">
+            <button onclick="fullscreenZone()">Fullscreen</button>
+            <button onclick="aboutBlank()">Open in New Tab</button>
+            <button onclick="downloadZone()">Download</button>
+            <button onclick="closeZone()">Close</button>
+          </div>
+        </div>
+        <iframe id="zoneFrame"></iframe>
+      </div>
+
+      <div id="popupOverlay">
+        <div class="popup">
+          <div class="popup-header">
+            <h3 id="popupTitle">Title</h3>
+            <button id="popupClose" onclick="closePopup()">×</button>
+          </div>
+          <div id="popupBody">Content will be here</div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer-links">
+          <a href="#" onclick="loadDMCA(); return false">DMCA</a>
+          <a href="#" onclick="showContact(); return false">Contact</a>
+          <a href="#" onclick="loadPrivacy(); return false">Privacy Policy</a>
+          <a href="javascript:saveData()">Export Data</a>
+          <a href="#" onclick="document.getElementById('importData').click(); return false">Import Data</a>
+          <input type="file" id="importData" style="display: none" onchange="loadData(event)" />
+        </div>
+        <div>
+          <script type="text/javascript">
+            aclib.runBanner({ zoneId: '10952070' });
+          </script>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         AUTH — device token check (Finn only)
+    ══════════════════════════════════════ -->
+    <script>
+      // ── Finn's device token ───────────────────────────────────────
+      // Only the device that has this exact token saved in localStorage
+      // will be allowed in. Everyone else gets blocked.
+      const FINN_TOKEN  = "7932befe56e10cd8c9f48f9321eb9fab57dfee2d6403c361fea9473818bba4f2";
+      const LOCAL_KEY   = "finny_device_token";
+      const SESSION_KEY = "finny_auth";
+      // ─────────────────────────────────────────────────────────────
+
+      function revealSite() {
+        document.getElementById("loginOverlay").classList.add("hidden");
+        document.getElementById("mainSite").classList.add("visible");
+        window.addEventListener("beforeunload", function(e) {
+          e.preventDefault();
+          e.returnValue = "";
+          return "Are you sure you want to leave? Any unsaved changes will be lost.";
+        });
+      }
+
+      function showLoginError(msg) {
+        const errBox = document.getElementById("loginError");
+        document.getElementById("loginErrorText").textContent = msg;
+        errBox.classList.remove("show");
+        void errBox.offsetWidth;
+        errBox.classList.add("show");
+      }
+
+      // Skip the gate if already verified this session
+      if (sessionStorage.getItem(SESSION_KEY) === "ok") {
+        revealSite();
+      }
+
+      window.doLogin = function() {
+        const btn        = document.getElementById("loginSubmit");
+        const savedToken = localStorage.getItem(LOCAL_KEY);
+
+        btn.classList.add("loading");
+        btn.innerHTML = '<span class="l-spinner"></span>Checking...';
+        document.getElementById("loginError").classList.remove("show");
+
+        setTimeout(function() {
+          if (savedToken === FINN_TOKEN) {
+            sessionStorage.setItem(SESSION_KEY, "ok");
+            btn.classList.remove("loading");
+            btn.classList.add("success");
+            btn.innerHTML = "✓ Welcome back Finn!";
+            setTimeout(revealSite, 600);
+          } else {
+            btn.classList.remove("loading");
+            btn.innerHTML = "Yes, I'm Finn — Let Me In";
+            showLoginError("This device is not recognised as Finn's. Go away!");
+          }
+        }, 600);
+      };
+
+      // Enter key
+      document.addEventListener("keydown", function(e) {
+        if (e.key === "Enter" && !document.getElementById("loginOverlay").classList.contains("hidden")) {
+          window.doLogin();
+        }
+      });
+
+      // ── HOW TO SET UP YOUR DEVICE (do this once) ─────────────────
+      //
+      // On YOUR device, open the browser console (F12) and paste:
+      //
+      //   localStorage.setItem("finny_device_token", "7932befe56e10cd8c9f48f9321eb9fab57dfee2d6403c361fea9473818bba4f2");
+      //
+      // Then click the button — it will let you in every time after.
+      // Any other device that hasn't run that line will be blocked.
+      //
+      // ─────────────────────────────────────────────────────────────
+    </script>
+
+    <script src="script.js"></script>
+
+    <script>
+      try {
+        var search  = new URLSearchParams(window.location.search);
+        var privacy = search.get('privacy');
+        if (privacy) { loadPrivacy(); }
+      } catch (e) {}
+    </script>
+
+    <script>
+      navigator.serviceWorker.register(location.protocol + '//' + location.hostname + '/sw.js');
+    </script>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WX5VS54ZDW"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-WX5VS54ZDW');
+    </script>
+
+  </body>
+</html>
